@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';           
-import Header from '@/components/Header';
+import { AuthProvider } from './context/AuthContext';
 
 export const metadata: Metadata = {
   title: 'ChiefBaranda.ng - Buy & Sell with Confidence',
@@ -32,9 +32,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased bg-gray-50">
-        <main className="min-h-[calc(100vh-80px)]">
+        <AuthProvider>
           {children}
-        </main>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -6,12 +6,14 @@ import Marketplace from '@/components/Marketplace';
 
 export default function Home() {
   return (
-    <div>
+    <>
       <Header />
-      <Hero />
-      <Listings />
-      <Marketplace />
+      <div>
+        <Hero />
+        <Listings />
+        <Marketplace />
+      </div>
       <Footer />
-    </div>
+    </>
   );
 }
