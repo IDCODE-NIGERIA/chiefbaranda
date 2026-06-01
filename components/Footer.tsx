@@ -1,5 +1,4 @@
 import Link from 'next/link';
-import { FaXTwitter, FaInstagram, FaFacebookF, FaTiktok, FaLinkedinIn } from 'react-icons/fa6';
 
 const Footer = () => {
   return (
@@ -21,25 +20,6 @@ const Footer = () => {
             <p className="text-gray-600 leading-relaxed max-w-md">
               A trusted marketplace for buying, selling <br /> and pre-ordering used and new items.
             </p>
-
-            {/* Social Media Icons */}
-            <div className="flex gap-4 mt-6">
-              <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <FaXTwitter size={22} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <FaInstagram size={22} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <FaFacebookF size={22} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <FaTiktok size={22} />
-              </a>
-              <a href="#" className="text-gray-500 hover:text-gray-900 transition-colors">
-                <FaLinkedinIn size={22} />
-              </a>
-            </div>
           </div>
 
           {/* Marketplace */}
@@ -70,6 +50,14 @@ const Footer = () => {
               <li><Link href="/help" className="hover:text-green-600 transition-colors">Help Center</Link></li>
               <li><Link href="/safety" className="hover:text-green-600 transition-colors">Safety Tips</Link></li>
               <li><Link href="/contact" className="hover:text-green-600 transition-colors">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div className="lg:col-span-2">
+            <h3 className="font-semibold text-gray-900 mb-4">Legal</h3>
+            <ul className="space-y-3 text-sm text-gray-600">
+              <li><Link href="/privacy" className="hover:text-green-600 transition-colors">Privacy Policy</Link></li>
               <li><Link href="/terms" className="hover:text-green-600 transition-colors">Terms and Conditions</Link></li>
             </ul>
           </div>

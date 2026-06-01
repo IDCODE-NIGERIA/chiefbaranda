@@ -1,11 +1,6 @@
 'use client';
 
 import Link from 'next/link';
-import { 
-  HiShieldCheck, 
-  HiLockClosed, 
-  HiLightningBolt 
-} from 'react-icons/hi';
 
 const Hero = () => {
   return (
@@ -83,8 +78,8 @@ const Hero = () => {
         {/* Bottom Trust Section */}
         <div className="mt-16 grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="flex items-start gap-4 bg-white p-6 rounded-2xl border border-gray-100">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <HiShieldCheck className="text-green-600" size={28} />
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+              ✓
             </div>
             <div>
               <p className="font-semibold text-gray-900">Verified Listing</p>
@@ -93,8 +88,8 @@ const Hero = () => {
           </div>
 
           <div className="flex items-start gap-4 bg-white p-6 rounded-2xl border border-gray-100">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <HiLockClosed className="text-green-600" size={28} />
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+              🔒
             </div>
             <div>
               <p className="font-semibold text-gray-900">Secured Payments</p>
@@ -103,8 +98,8 @@ const Hero = () => {
           </div>
 
           <div className="flex items-start gap-4 bg-white p-6 rounded-2xl border border-gray-100">
-            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
-              <HiLightningBolt className="text-green-600" size={28} />
+            <div className="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 text-2xl">
+              ⚡
             </div>
             <div>
               <p className="font-semibold text-gray-900">Fast & Easy</p>

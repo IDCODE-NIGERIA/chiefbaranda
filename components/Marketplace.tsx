@@ -1,33 +1,26 @@
 'use client';
 
-import { 
-  HiShieldCheck, 
-  HiLockClosed, 
-  HiShieldExclamation, 
-  HiChatAlt2 
-} from 'react-icons/hi';
-
 const TrustAndCTA = () => {
   const features = [
     {
       title: "Verified Listing",
       desc: "We verify sellers and listing for your peace of mind.",
-      icon: <HiShieldCheck className="w-6 h-6 text-gray-400" />
+      icon: "✓"
     },
     {
       title: "Escrow Protection",
       desc: "Your money is held securely until delivery is confirmed.",
-      icon: <HiLockClosed className="w-6 h-6 text-gray-400" />
+      icon: "🔒"
     },
     {
       title: "Fraud Protection",
       desc: "Advanced system to detect and prevent fraud and scam.",
-      icon: <HiShieldExclamation className="w-6 h-6 text-gray-400" />
+      icon: "⚠️"
     },
     {
       title: "Secure Messaging",
       desc: "Chat safely within our platform your privacy matters.",
-      icon: <HiChatAlt2 className="w-6 h-6 text-gray-400" />
+      icon: "💬"
     }
   ];
 
@@ -47,7 +40,7 @@ const TrustAndCTA = () => {
                   index !== features.length - 1 ? 'lg:border-r border-gray-200' : ''
                 } ${index < 2 ? 'border-b lg:border-b-0' : ''}`}
               >
-                <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center flex-shrink-0 text-lg">
                   {item.icon}
                 </div>
                 <div className="text-left space-y-1">

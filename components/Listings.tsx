@@ -1,7 +1,5 @@
 'use client';
 
-import { HiLocationMarker, HiClock } from 'react-icons/hi';
-
 const Listings = () => {
   const featured = [
     { id: 1, img: '/list1.png', name: 'Toyota Camry 2020', price: '₦ 17,000,000', loc: 'Abuja, Nigeria', tag: 'Verified' },
@@ -41,7 +39,7 @@ const Listings = () => {
                   </div>
                   <div className="flex items-center justify-between pt-2">
                     <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
-                      {car.loc === 'Coming Soon' ? <HiClock className="w-4 h-4" /> : <HiLocationMarker className="w-4 h-4" />}
+                      <span>{car.loc === 'Coming Soon' ? '⏱️' : '📍'}</span>
                       {car.loc}
                     </div>
                     <button className="bg-green-900 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-800 transition-colors">
