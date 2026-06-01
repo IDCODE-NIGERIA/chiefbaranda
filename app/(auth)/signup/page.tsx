@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/app/context/AuthContext';
 
 type UserType = 'buyer' | 'seller';
 
-export default function SignUpPage() {
+function SignUpContent() {
   const router = useRouter();
   const params = useSearchParams();
   const { signup, error: authError, clearError, isAuthenticated } = useAuth();
@@ -269,6 +269,14 @@ export default function SignUpPage() {
         </Link>
       </p>
     </div>
+  );
+}
+
+export default function SignUpPage() {
+  return (
+    <Suspense>
+      <SignUpContent />
+    </Suspense>
   );
 }
 
