@@ -1,5 +1,5 @@
 import { NextRequest } from 'next/server';
-import { ObjectId } from 'mongodb';
+
 import { getDatabase } from '@/lib/mongodb';
 import { verifyPassword, signToken, isValidEmail } from '@/lib/auth';
 import { successResponse, validationError, errorResponse, setAuthCookie } from '@/lib/api-utils';

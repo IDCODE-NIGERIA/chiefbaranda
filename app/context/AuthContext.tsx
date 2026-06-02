@@ -42,11 +42,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Check if user is already logged in on mount
-  useEffect(() => {
-    checkAuthStatus();
-  }, []);
-
   async function checkAuthStatus() {
     try {
       const response = await fetch('/api/auth/me', {
@@ -58,11 +53,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(data.data);
       }
     } catch (err) {
-      console.error('Error checking auth status:', err);
+      console.error('Auth check failed:', err);
     } finally {
       setLoading(false);
     }
   }
+
+  // Check if user is already logged in on mount
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    checkAuthStatus();
+  }, []);
 
   async function signup(data: SignupData) {
     setError(null);
