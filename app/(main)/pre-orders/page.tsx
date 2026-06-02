@@ -156,22 +156,6 @@ export default function PreOrdersPage() {
           }}
         />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-14 pb-12 lg:pt-20 lg:pb-16">
-          <div className="flex items-center justify-between mb-6 gap-4 flex-wrap">
-            <nav className="text-sm text-neutral-500" aria-label="Breadcrumb">
-              <Link href="/" className="hover:text-neutral-900">Home</Link>
-              <span className="mx-2 text-neutral-300">/</span>
-              <span className="text-neutral-900">Pre-orders</span>
-            </nav>
-            <Link
-              href="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-neutral-300 bg-white px-4 py-2 text-sm font-medium text-neutral-800 hover:border-neutral-900 hover:bg-neutral-900 hover:text-white transition-colors"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M19 12H5M12 19l-7-7 7-7" />
-              </svg>
-              Home
-            </Link>
-          </div>
 
           <div className="grid lg:grid-cols-12 gap-8 items-center">
             <div className="lg:col-span-7">
