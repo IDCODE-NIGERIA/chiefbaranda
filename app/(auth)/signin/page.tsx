@@ -56,7 +56,7 @@ function SignInContent() {
           Welcome back, Chief.
         </h1>
         <p className="mt-2.5 text-[15px] text-neutral-500">
-          Pick up where you left off — your saved cars are waiting.
+          Pick up where you left off your saved cars are waiting.
         </p>
       </div>
 

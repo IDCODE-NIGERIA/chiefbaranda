@@ -121,6 +121,40 @@ export default function CategoriesPage() {
         </div>
       </section>
 
+      {/* Pre-order promo */}
+      <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 lg:pt-16">
+        <Link
+          href="/pre-orders"
+          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-5 rounded-2xl border border-neutral-200 bg-linear-to-br from-emerald-50 to-white px-6 py-6 lg:px-8 hover:border-neutral-900 transition-colors"
+        >
+          <div className="flex items-start gap-4">
+            <span className="grid place-items-center h-12 w-12 shrink-0 rounded-full bg-green-600 text-white">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M2 20a2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1" />
+                <path d="M4 18l-2-6h20l-2 6" />
+                <path d="M12 10V4M9 4h6" />
+              </svg>
+            </span>
+            <div>
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-green-700/80 mb-1">
+                Not in stock yet?
+              </p>
+              <h2 className="text-xl lg:text-2xl font-semibold tracking-tight text-neutral-900">
+                Pre-order it directly from verified importers
+              </h2>
+              <p className="mt-1 text-sm text-neutral-600 max-w-xl">
+                Deposit small, track the shipment, inspect before you pay the
+                balance. No agents, no middleman markup.
+              </p>
+            </div>
+          </div>
+          <span className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white group-hover:bg-neutral-800 whitespace-nowrap">
+            Browse pre-orders
+            <Arrow small />
+          </span>
+        </Link>
+      </section>
+
       {/* Body Type Grid */}
       <section className="max-w-7xl mx-auto px-6 lg:px-8 py-12 lg:py-16">
         <div className="flex items-end justify-between mb-8">
