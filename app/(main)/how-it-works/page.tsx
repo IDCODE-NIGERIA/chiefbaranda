@@ -30,6 +30,29 @@ const buyerSteps = [
   },
 ];
 
+const preOrderSteps = [
+  {
+    n: '01',
+    title: 'Tell us the car',
+    body: 'Pick an open slot or send the exact spec you want, year, trim, mileage band, colour. We confirm what we can find and at what price within 48 hours.',
+  },
+  {
+    n: '02',
+    title: 'Lock it with a deposit',
+    body: 'A small deposit, usually 8 to 12% of the price, reserves the unit. Your money sits in escrow with our partner bank until the car lands here.',
+  },
+  {
+    n: '03',
+    title: 'Track it from port to port',
+    body: 'You get real updates as the car ships in. Customs duty, terminal charges and inland delivery are all itemised, so there are no surprise bills at the end.',
+  },
+  {
+    n: '04',
+    title: 'Inspect, then pay the balance',
+    body: 'Inspect the car at our Lagos, Abuja or PH yard. If anything is off, walk away and your deposit is refunded. Otherwise the balance unlocks the keys.',
+  },
+];
+
 const sellerSteps = [
   {
     n: '01',
@@ -156,6 +179,48 @@ export default function HowItWorksPage() {
               </li>
             ))}
           </ol>
+        </div>
+      </section>
+
+      {/* Pre-order */}
+      <section id="pre-order" className="border-t border-neutral-100 scroll-mt-24">
+        <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14 lg:py-20">
+          <div className="grid lg:grid-cols-12 gap-10">
+            <div className="lg:col-span-4">
+              <p className="text-xs font-medium uppercase tracking-[0.18em] text-green-700/80 mb-3">
+                Pre-order
+              </p>
+              <h2 className="text-3xl lg:text-4xl font-semibold tracking-tight text-neutral-900 leading-tight">
+                Can&apos;t find it? Order it in.
+              </h2>
+              <p className="mt-4 text-neutral-600">
+                For cars not in the country yet. Reserve from a verified importer,
+                track the shipment, and only pay the balance once you&apos;ve seen it.
+              </p>
+              <Link
+                href="/pre-orders"
+                className="mt-6 inline-flex items-center gap-2 rounded-full bg-green-600 px-6 py-3 text-sm font-semibold text-white hover:bg-green-700"
+              >
+                Browse pre-orders
+                <Arrow />
+              </Link>
+            </div>
+
+            <ol className="lg:col-span-8 grid sm:grid-cols-2 gap-5">
+              {preOrderSteps.map((s) => (
+                <li
+                  key={s.n}
+                  className="rounded-xl border border-neutral-200 p-6 hover:border-neutral-900 transition-colors"
+                >
+                  <p className="font-mono text-xs text-green-700 mb-3">{s.n}</p>
+                  <h3 className="text-lg font-semibold tracking-tight text-neutral-900">
+                    {s.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-neutral-600 leading-relaxed">{s.body}</p>
+                </li>
+              ))}
+            </ol>
+          </div>
         </div>
       </section>
 

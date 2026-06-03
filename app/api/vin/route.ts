@@ -2,13 +2,11 @@ import { NextRequest } from 'next/server';
 
 import { successResponse, errorResponse, validationError } from '@/lib/api-utils';
 
-// VINs are 17 characters and never contain I, O or Q (to avoid confusion
-// with 1 and 0). Anything else is rejected before we hit the upstream API.
+// 17 chars, no I/O/Q
 const VIN_REGEX = /^[A-HJ-NPR-Z0-9]{17}$/i;
 
 const NHTSA_ENDPOINT = 'https://vpic.nhtsa.dot.gov/api/vehicles/DecodeVinValues';
 
-// Raw shape of the single result object NHTSA returns for DecodeVinValues.
 interface NhtsaResult {
   Make?: string;
   Model?: string;
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
     const url = `${NHTSA_ENDPOINT}/${encodeURIComponent(rawVin)}?format=json`;
     const upstream = await fetch(url, {
       headers: { Accept: 'application/json' },
-      // Decoded VINs never change, so let Next cache the upstream response.
+      // decoded VINs never change
       next: { revalidate: 60 * 60 * 24 },
     });
 
@@ -68,9 +66,7 @@ export async function POST(request: NextRequest) {
       return errorResponse('No data returned for this VIN', 'NOT_FOUND', 404);
     }
 
-    // ErrorCode "0" means a clean decode. Other codes can still carry useful
-    // partial data, so we surface a note rather than failing outright — unless
-    // we got nothing usable back at all.
+    // "0" is a clean decode; other codes can still carry partial data
     const errorCode = result.ErrorCode?.split(',')[0]?.trim() ?? '';
     const make = clean(result.Make);
     const model = clean(result.Model);

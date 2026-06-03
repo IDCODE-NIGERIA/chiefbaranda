@@ -2,105 +2,24 @@ import Link from 'next/link';
 import Image from 'next/image';
 import type { Metadata } from 'next';
 
+import {
+  preOrderSlots,
+  originCountries,
+  formatNaira,
+  type PreOrderSlot,
+} from '@/lib/carData';
+
 export const metadata: Metadata = {
   title: 'Pre-orders · ChiefBaranda',
   description:
     'Pre-order your next car directly from verified dealers and importers. No agents, no middleman markup. Deposit small, pick up in Lagos, Abuja or PH.',
 };
 
-type Slot = {
-  id: string;
-  title: string;
-  trim: string;
-  image: string;
-  fromPrice: number;
-  deposit: number;
-  eta: string;
-  port: 'Lagos' | 'Abuja' | 'Port Harcourt';
-  remaining: number;
-  source: string;
-};
-
-const slots: Slot[] = [
-  {
-    id: 'camry-2024',
-    title: 'Toyota Camry',
-    trim: '2024 SE · Foreign-used',
-    image: '/cs1.png',
-    fromPrice: 24_500_000,
-    deposit: 2_000_000,
-    eta: '4–6 weeks',
-    port: 'Lagos',
-    remaining: 3,
-    source: 'Houston, TX',
-  },
-  {
-    id: 'rav4-2023',
-    title: 'Toyota RAV4',
-    trim: '2023 XLE Hybrid',
-    image: '/cs2.png',
-    fromPrice: 32_900_000,
-    deposit: 3_000_000,
-    eta: '5–7 weeks',
-    port: 'Lagos',
-    remaining: 5,
-    source: 'New Jersey, US',
-  },
-  {
-    id: 'hilux-2024',
-    title: 'Toyota Hilux',
-    trim: '2024 Adventure 4x4',
-    image: '/cs3.png',
-    fromPrice: 41_000_000,
-    deposit: 4_500_000,
-    eta: '6–8 weeks',
-    port: 'Port Harcourt',
-    remaining: 2,
-    source: 'Dubai, UAE',
-  },
-  {
-    id: 'civic-2023',
-    title: 'Honda Civic',
-    trim: '2023 Sport Touring',
-    image: '/cs4.png',
-    fromPrice: 27_800_000,
-    deposit: 2_500_000,
-    eta: '4–6 weeks',
-    port: 'Lagos',
-    remaining: 4,
-    source: 'Atlanta, GA',
-  },
-  {
-    id: 'gle-2022',
-    title: 'Mercedes-Benz GLE 350',
-    trim: '2022 · Foreign-used',
-    image: '/list3.png',
-    fromPrice: 58_000_000,
-    deposit: 6_000_000,
-    eta: '6–9 weeks',
-    port: 'Lagos',
-    remaining: 1,
-    source: 'Munich, DE',
-  },
-  {
-    id: 'rangerover-2023',
-    title: 'Range Rover Sport',
-    trim: '2023 P530 First Edition',
-    image: '/list4.png',
-    fromPrice: 145_000_000,
-    deposit: 15_000_000,
-    eta: '8–12 weeks',
-    port: 'Abuja',
-    remaining: 1,
-    source: 'London, UK',
-  },
-];
-
 const steps = [
   {
     n: '01',
     title: 'Tell us the car',
-    body: 'Pick from open slots or send the exact spec — year, trim, mileage band, colour. We confirm what we can find and at what price within 48 hours.',
+    body: 'Pick from open slots or send the exact spec year, trim, mileage band, colour. We confirm what we can find and at what price within 48 hours.',
   },
   {
     n: '02',
@@ -110,12 +29,12 @@ const steps = [
   {
     n: '03',
     title: 'We ship and clear',
-    body: 'You get tracking updates from port to port. Customs duty, terminal charges and inland delivery are all itemised — no surprise bills.',
+    body: 'You get tracking updates from port to port. Customs duty, terminal charges and inland delivery are all itemised no surprise bills.',
   },
   {
     n: '04',
     title: 'Inspect, then pay the balance',
-    body: 'You inspect at our Lagos, Abuja or PH yard. If anything is off, walk away — your deposit is refunded. Otherwise, balance unlocks the keys.',
+    body: 'You inspect at our Lagos, Abuja or PH yard. If anything is off, walk away your deposit is refunded. Otherwise, balance unlocks the keys.',
   },
 ];
 
@@ -126,7 +45,7 @@ const faqs = [
   },
   {
     q: 'Who holds my deposit?',
-    a: 'Deposits are held in a dedicated escrow account with Providus Bank. ChiefBaranda cannot touch the funds until you sign off at inspection — or until a refund is triggered.',
+    a: 'Deposits are held in a dedicated escrow account with Providus Bank. ChiefBaranda cannot touch the funds until you sign off at inspection or until a refund is triggered.',
   },
   {
     q: 'Can I pre-order a car that isn’t on the list?',
@@ -134,16 +53,21 @@ const faqs = [
   },
   {
     q: 'How is the final price calculated?',
-    a: 'The price you see on this page is the all-in landed price — vehicle + freight + customs duty + clearing + inland delivery. No hidden agent fees.',
+    a: 'The price you see on this page is the all-in landed price vehicle + freight + customs duty + clearing + inland delivery. No hidden agent fees.',
   },
 ];
 
-function formatNaira(n: number) {
-  if (n >= 1_000_000) return `₦${(n / 1_000_000).toFixed(n % 1_000_000 === 0 ? 0 : 1)}m`;
-  return `₦${n.toLocaleString()}`;
-}
+export default async function PreOrdersPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ from?: string }>;
+}) {
+  const { from } = await searchParams;
+  const activeCountry = originCountries.find((c) => c.slug === from);
+  const visibleSlots = activeCountry
+    ? preOrderSlots.filter((s) => s.origin === activeCountry.slug)
+    : preOrderSlots;
 
-export default function PreOrdersPage() {
   return (
     <div className="bg-white">
       <section className="relative border-b border-neutral-100 overflow-hidden">
@@ -237,7 +161,7 @@ export default function PreOrdersPage() {
                 Four steps. No phone calls at midnight.
               </h2>
               <p className="mt-4 text-neutral-600">
-                We&apos;ve done this 2,000+ times. Every step is itemised so you
+                We&apos;ve done this many times. Every step is itemized so you
                 can see exactly where your money is and what happens next.
               </p>
             </div>
@@ -261,10 +185,10 @@ export default function PreOrdersPage() {
       </section>
 
       <section id="open-slots" className="max-w-7xl mx-auto px-6 lg:px-8 py-14 lg:py-20 scroll-mt-24">
-        <div className="flex items-end justify-between mb-8 flex-wrap gap-3">
+        <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
           <div>
             <h2 className="text-2xl lg:text-3xl font-semibold tracking-tight text-neutral-900">
-              Open slots
+              {activeCountry ? `Open slots from ${activeCountry.name}` : 'Open slots'}
             </h2>
             <p className="mt-2 text-neutral-600">
               Spots refresh every Monday. Prices are the all-in landed cost.
@@ -280,11 +204,58 @@ export default function PreOrdersPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {slots.map((s) => (
-            <SlotCard key={s.id} s={s} />
-          ))}
+        {/* Filter by where the car ships from */}
+        <div className="mb-8 flex flex-wrap gap-2">
+          <Link
+            href="/pre-orders#open-slots"
+            className={[
+              'rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+              !activeCountry
+                ? 'bg-neutral-900 text-white border-neutral-900'
+                : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400',
+            ].join(' ')}
+          >
+            All countries
+          </Link>
+          {originCountries.map((c) => {
+            const isActive = c.slug === activeCountry?.slug;
+            return (
+              <Link
+                key={c.slug}
+                href={`/pre-orders?from=${c.slug}#open-slots`}
+                className={[
+                  'inline-flex items-center gap-1.5 rounded-full border px-4 py-1.5 text-sm font-medium transition-colors',
+                  isActive
+                    ? 'bg-neutral-900 text-white border-neutral-900'
+                    : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400',
+                ].join(' ')}
+              >
+                <span>{c.flag}</span>
+                {c.name}
+              </Link>
+            );
+          })}
         </div>
+
+        {visibleSlots.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+            {visibleSlots.map((s) => (
+              <SlotCard key={s.id} s={s} />
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-2xl border border-dashed border-neutral-300 bg-neutral-50 py-16 text-center">
+            <p className="text-neutral-500">
+              No open slots from {activeCountry?.name} right now.
+            </p>
+            <Link
+              href="/pre-orders#open-slots"
+              className="mt-3 inline-block text-sm font-medium text-green-700 hover:text-green-800 underline underline-offset-2"
+            >
+              See all countries
+            </Link>
+          </div>
+        )}
       </section>
 
       <section className="border-y border-neutral-100 bg-neutral-50/60">
@@ -357,7 +328,7 @@ export default function PreOrdersPage() {
   );
 }
 
-function SlotCard({ s }: { s: Slot }) {
+function SlotCard({ s }: { s: PreOrderSlot }) {
   const urgent = s.remaining <= 2;
   return (
     <article className="group rounded-2xl border border-neutral-200 bg-white overflow-hidden hover:border-neutral-900 transition-colors flex flex-col">

@@ -5,10 +5,13 @@ import Link from 'next/link';
 import Image from 'next/image';
 import BrandDropdown from '@/components/BrandDropdown';
 import ConditionTabs from '@/components/ConditionTabs';
+import CountryDropdown from '@/components/CountryDropdown';
 import {
   bodyTypes,
   brands,
   lifestyleFilters,
+  originCountries,
+  preOrderSlots,
   formatNaira,
   conditionLabels,
   conditionColors,
@@ -39,6 +42,7 @@ const bodyTypeConditions: Record<string, Condition[]> = {
 export default function CategoriesPage() {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedCondition, setSelectedCondition] = useState<'all' | Condition>('all');
+  const [origin, setOrigin] = useState('');
 
   const filteredCategories = useMemo(() => {
     let result = bodyTypes;
@@ -54,6 +58,11 @@ export default function CategoriesPage() {
   }, [selectedCondition]);
 
   const activeBrand = brands.find((b) => b.slug === selectedBrand);
+  const activeCountry = originCountries.find((c) => c.slug === origin);
+  const originCount = origin
+    ? preOrderSlots.filter((s) => s.origin === origin).length
+    : preOrderSlots.length;
+  const preOrderHref = origin ? `/pre-orders?from=${origin}` : '/pre-orders';
 
   return (
     <div className="bg-white">
@@ -121,38 +130,65 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      {/* Pre-order promo */}
+      {/* Import from abroad */}
       <section className="max-w-7xl mx-auto px-6 lg:px-8 pt-12 lg:pt-16">
-        <Link
-          href="/pre-orders"
-          className="group flex flex-col sm:flex-row sm:items-center justify-between gap-5 rounded-2xl border border-neutral-200 bg-linear-to-br from-emerald-50 to-white px-6 py-6 lg:px-8 hover:border-neutral-900 transition-colors"
-        >
-          <div className="flex items-start gap-4">
-            <span className="grid place-items-center h-12 w-12 shrink-0 rounded-full bg-green-600 text-white">
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M2 20a2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1" />
-                <path d="M4 18l-2-6h20l-2 6" />
-                <path d="M12 10V4M9 4h6" />
-              </svg>
-            </span>
+        <div className="rounded-2xl border border-neutral-200 bg-linear-to-br from-emerald-50 to-white p-6 lg:p-8">
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
             <div>
               <p className="text-xs font-medium uppercase tracking-[0.18em] text-green-700/80 mb-1">
-                Not in stock yet?
+                Not in the country yet?
               </p>
               <h2 className="text-xl lg:text-2xl font-semibold tracking-tight text-neutral-900">
-                Pre-order it directly from verified importers
+                Browse cars from outside Nigeria
               </h2>
               <p className="mt-1 text-sm text-neutral-600 max-w-xl">
-                Deposit small, track the shipment, inspect before you pay the
-                balance. No agents, no middleman markup.
+                Pick where you want it shipped from, then pre-order directly from a
+                verified importer. Deposit small, inspect before you pay the balance.
               </p>
             </div>
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+              <CountryDropdown value={origin} onChange={setOrigin} />
+              <Link
+                href={preOrderHref}
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-800 whitespace-nowrap"
+              >
+                {activeCountry ? `View ${originCount} from ${activeCountry.name}` : 'Browse all pre-orders'}
+                <Arrow small />
+              </Link>
+            </div>
           </div>
-          <span className="inline-flex items-center gap-2 self-start sm:self-auto rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white group-hover:bg-neutral-800 whitespace-nowrap">
-            Browse pre-orders
-            <Arrow small />
-          </span>
-        </Link>
+
+          {/* Quick country chips */}
+          <div className="mt-5 flex flex-wrap gap-2">
+            {originCountries.map((c) => {
+              const isActive = c.slug === origin;
+              return (
+                <button
+                  key={c.slug}
+                  type="button"
+                  onClick={() => setOrigin(isActive ? '' : c.slug)}
+                  className={[
+                    'inline-flex items-center gap-1.5 rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors',
+                    isActive
+                      ? 'bg-neutral-900 text-white border-neutral-900'
+                      : 'bg-white text-neutral-700 border-neutral-200 hover:border-neutral-400',
+                  ].join(' ')}
+                >
+                  <span>{c.flag}</span>
+                  {c.name}
+                </button>
+              );
+            })}
+          </div>
+
+          {activeCountry && (
+            <p className="mt-4 text-sm text-neutral-600">
+              <span className="font-medium text-neutral-900">{activeCountry.name}:</span>{' '}
+              {activeCountry.blurb} {originCount} {originCount === 1 ? 'car' : 'cars'} ready to pre-order.
+            </p>
+          )}
+        </div>
       </section>
 
       {/* Body Type Grid */}
