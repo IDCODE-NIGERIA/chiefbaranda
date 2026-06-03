@@ -14,7 +14,7 @@ import {
   conditionColors,
   type BodyType,
   type Condition,
-} from '@/lib/carData';
+} from '../../../lib/carData';
 
 const toneStyles: Record<BodyType['tone'], string> = {
   forest: 'from-emerald-100 to-emerald-50',
