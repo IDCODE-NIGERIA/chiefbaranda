@@ -3,6 +3,8 @@ import { ObjectId } from 'mongodb';
 export interface Car {
   _id?: ObjectId;
   title: string;
+  brand: string;
+  condition: 'brand-new' | 'foreign-used' | 'nigerian-used';
   type: 'sedan' | 'suv' | 'truck' | 'coupe' | 'hatchback' | 'van' | string;
   price: number;
   sellerId: ObjectId | string;

@@ -1,6 +1,7 @@
 import { MongoClient, Db } from 'mongodb';
 
-let cached = global as any;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const cached = global as any;
 
 if (!cached.mongo) {
   cached.mongo = { conn: null, db: null };

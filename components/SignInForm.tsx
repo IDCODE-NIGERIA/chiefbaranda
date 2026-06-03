@@ -8,7 +8,7 @@ interface SignInFormProps {
   onClose?: () => void;
 }
 
-export default function SignInForm({ onSuccess, onClose }: SignInFormProps) {
+export default function SignInForm({ onSuccess }: SignInFormProps) {
   const { signin, error: authError, clearError } = useAuth();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -53,7 +53,7 @@ export default function SignInForm({ onSuccess, onClose }: SignInFormProps) {
     try {
       await signin(formData.email, formData.password);
       onSuccess?.();
-    } catch (err) {
+    } catch {
       setLoading(false);
     }
   };

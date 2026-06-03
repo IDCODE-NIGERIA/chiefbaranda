@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import React, { useState } from 'react';
@@ -31,16 +32,16 @@ const Header = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
+              <Link href="/" className="hover:text-green-600 transition-colors">
+                Home
+              </Link>
               <Link href="/categories" className="hover:text-green-600 transition-colors">
                 Categories
               </Link>
-              <Link href="/" className="hover:text-green-600 transition-colors">
+              <Link href="/how-it-works" className="hover:text-green-600 transition-colors">
                 How it works
               </Link>
-              <Link href="/pre-orders" className="hover:text-green-600 transition-colors">
-                Pre-order
-              </Link>
-              <Link href="/" className="hover:text-green-600 transition-colors">
+              <Link href="/become-seller" className="hover:text-green-600 transition-colors">
                 Become a seller
               </Link>
             </nav>
@@ -129,16 +130,16 @@ const Header = () => {
           {isMenuOpen && (
             <div className="md:hidden mt-4 pt-4 border-t border-gray-100">
               <nav className="flex flex-col gap-4 text-sm font-medium text-gray-600">
+                <Link href="/" className="hover:text-green-600 transition-colors py-1">
+                  Home
+                </Link>
                 <Link href="/categories" className="hover:text-green-600 transition-colors py-1">
                   Categories
                 </Link>
-                <Link href="/" className="hover:text-green-600 transition-colors py-1">
+                <Link href="/how-it-works" className="hover:text-green-600 transition-colors py-1">
                   How it works
                 </Link>
-                <Link href="/pre-orders" className="hover:text-green-600 transition-colors py-1">
-                  Pre-order
-                </Link>
-                <Link href="/" className="hover:text-green-600 transition-colors py-1">
+                <Link href="/become-seller" className="hover:text-green-600 transition-colors py-1">
                   Become a seller
                 </Link>
               </nav>
