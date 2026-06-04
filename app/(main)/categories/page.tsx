@@ -6,6 +6,7 @@ import Image from 'next/image';
 import BrandDropdown from '@/components/BrandDropdown';
 import ConditionTabs from '@/components/ConditionTabs';
 import CountryDropdown from '@/components/CountryDropdown';
+import PreOrderCard from '@/components/PreOrderCard';
 import {
   bodyTypes,
   brands,
@@ -59,10 +60,8 @@ export default function CategoriesPage() {
 
   const activeBrand = brands.find((b) => b.slug === selectedBrand);
   const activeCountry = originCountries.find((c) => c.slug === origin);
-  const originCount = origin
-    ? preOrderSlots.filter((s) => s.origin === origin).length
-    : preOrderSlots.length;
-  const preOrderHref = origin ? `/pre-orders?from=${origin}` : '/pre-orders';
+  const importedCars = origin ? preOrderSlots.filter((s) => s.origin === origin) : [];
+  const originCount = origin ? importedCars.length : preOrderSlots.length;
 
   return (
     <div className="bg-white">
@@ -147,15 +146,8 @@ export default function CategoriesPage() {
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+            <div className="shrink-0">
               <CountryDropdown value={origin} onChange={setOrigin} />
-              <Link
-                href={preOrderHref}
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-800 whitespace-nowrap"
-              >
-                {activeCountry ? `View ${originCount} from ${activeCountry.name}` : 'Browse all pre-orders'}
-                <Arrow small />
-              </Link>
             </div>
           </div>
 
@@ -189,6 +181,23 @@ export default function CategoriesPage() {
             </p>
           )}
         </div>
+
+        {/* Pre-order cars for the selected country, inline */}
+        {activeCountry && (
+          <div className="mt-6">
+            {importedCars.length > 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                {importedCars.map((s) => (
+                  <PreOrderCard key={s.id} s={s} />
+                ))}
+              </div>
+            ) : (
+              <p className="rounded-xl border border-dashed border-neutral-300 bg-neutral-50 py-10 text-center text-sm text-neutral-500">
+                No cars from {activeCountry.name} right now. Try another country.
+              </p>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Body Type Grid */}

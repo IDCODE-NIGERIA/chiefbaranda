@@ -1,13 +1,8 @@
 import Link from 'next/link';
-import Image from 'next/image';
 import type { Metadata } from 'next';
 
-import {
-  preOrderSlots,
-  originCountries,
-  formatNaira,
-  type PreOrderSlot,
-} from '@/lib/carData';
+import PreOrderCard from '@/components/PreOrderCard';
+import { preOrderSlots, originCountries } from '@/lib/carData';
 
 export const metadata: Metadata = {
   title: 'Pre-orders · ChiefBaranda',
@@ -81,70 +76,36 @@ export default async function PreOrdersPage({
         />
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 pt-14 pb-12 lg:pt-20 lg:pb-16">
 
-          <div className="grid lg:grid-cols-12 gap-8 items-center">
-            <div className="lg:col-span-7">
-              <p className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 mb-5">
-                <span className="h-1.5 w-1.5 rounded-full bg-green-600 animate-pulse" />
-                14 active slots this week
-              </p>
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-900 leading-[1.05]">
-                Order the car.
-                <br />
-                Skip the <span className="text-green-600">middleman.</span>
-              </h1>
-              <p className="mt-5 text-lg text-neutral-600 max-w-xl">
-                Reserve directly from verified importers. Deposit small, track the
-                ship in real time, inspect before you pay the balance. The way it
-                should have been all along.
-              </p>
+          <div className="max-w-2xl">
+            <p className="inline-flex items-center gap-2 rounded-full border border-green-200 bg-green-50 px-3 py-1 text-xs font-medium text-green-800 mb-5">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-600 animate-pulse" />
+              14 active slots this week
+            </p>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-neutral-900 leading-[1.05]">
+              Order the car.
+              <br />
+              Skip the <span className="text-green-600">middleman.</span>
+            </h1>
+            <p className="mt-5 text-lg text-neutral-600 max-w-xl">
+              Reserve directly from verified importers. Deposit small, track the
+              ship in real time, inspect before you pay the balance. The way it
+              should have been all along.
+            </p>
 
-              <div className="mt-7 flex flex-wrap gap-3">
-                <a
-                  href="#open-slots"
-                  className="inline-flex items-center gap-2 rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-800"
-                >
-                  See open slots
-                  <Arrow />
-                </a>
-                <Link
-                  href="/pre-orders/custom"
-                  className="inline-flex items-center gap-2 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-800 hover:border-neutral-900"
-                >
-                  Request a custom spec
-                </Link>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5">
-              <div className="rounded-2xl border border-neutral-200 bg-white shadow-sm p-6">
-                <p className="text-xs font-medium uppercase tracking-[0.18em] text-neutral-500 mb-4">
-                  In transit right now
-                </p>
-                <ul className="space-y-4">
-                  <ShipRow
-                    car="2024 Lexus RX 350"
-                    route="Long Beach → Lagos"
-                    eta="Arrives in 11 days"
-                  />
-                  <ShipRow
-                    car="2023 Toyota Hilux"
-                    route="Jebel Ali → Tin Can"
-                    eta="Arrives in 18 days"
-                  />
-                  <ShipRow
-                    car="2022 BMW X5 xDrive40i"
-                    route="Bremerhaven → PH"
-                    eta="Arrives in 24 days"
-                  />
-                </ul>
-                <Link
-                  href="/pre-orders/tracking"
-                  className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-neutral-700 hover:text-green-700"
-                >
-                  Track a shipment
-                  <Arrow small />
-                </Link>
-              </div>
+            <div className="mt-7 flex flex-wrap gap-3">
+              <a
+                href="#open-slots"
+                className="inline-flex items-center gap-2 rounded-full bg-neutral-950 px-6 py-3 text-sm font-semibold text-white hover:bg-neutral-800"
+              >
+                See open slots
+                <Arrow />
+              </a>
+              <Link
+                href="/pre-orders/custom"
+                className="inline-flex items-center gap-2 rounded-full border border-neutral-300 px-6 py-3 text-sm font-semibold text-neutral-800 hover:border-neutral-900"
+              >
+                Request a custom spec
+              </Link>
             </div>
           </div>
         </div>
@@ -240,7 +201,7 @@ export default async function PreOrdersPage({
         {visibleSlots.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
             {visibleSlots.map((s) => (
-              <SlotCard key={s.id} s={s} />
+              <PreOrderCard key={s.id} s={s} />
             ))}
           </div>
         ) : (
@@ -325,90 +286,6 @@ export default async function PreOrdersPage({
         </div>
       </section>
     </div>
-  );
-}
-
-function SlotCard({ s }: { s: PreOrderSlot }) {
-  const urgent = s.remaining <= 2;
-  return (
-    <article className="group rounded-2xl border border-neutral-200 bg-white overflow-hidden hover:border-neutral-900 transition-colors flex flex-col">
-      <div className="relative aspect-16/10 bg-linear-to-br from-neutral-100 to-neutral-50">
-        <Image
-          src={s.image}
-          alt={`${s.title} — ${s.trim}`}
-          fill
-          sizes="(max-width: 768px) 100vw, 33vw"
-          className="object-contain p-5 group-hover:scale-[1.03] transition-transform duration-500"
-        />
-        <span
-          className={[
-            'absolute top-4 left-4 inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium',
-            urgent ? 'bg-red-50 text-red-700 border border-red-200' : 'bg-white/90 backdrop-blur text-neutral-700',
-          ].join(' ')}
-        >
-          <span className={`h-1.5 w-1.5 rounded-full ${urgent ? 'bg-red-600' : 'bg-green-600'}`} />
-          {s.remaining} {s.remaining === 1 ? 'slot' : 'slots'} left
-        </span>
-        <span className="absolute top-4 right-4 rounded-full bg-neutral-900/90 backdrop-blur px-2.5 py-1 text-[11px] font-medium text-white">
-          {s.eta}
-        </span>
-      </div>
-
-      <div className="p-5 flex-1 flex flex-col">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h3 className="text-lg font-semibold tracking-tight text-neutral-900">{s.title}</h3>
-            <p className="text-sm text-neutral-500 mt-0.5">{s.trim}</p>
-          </div>
-        </div>
-
-        <dl className="mt-5 grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <dt className="text-[11px] uppercase tracking-wider text-neutral-500">All-in</dt>
-            <dd className="font-semibold text-neutral-900 mt-0.5">{formatNaira(s.fromPrice)}</dd>
-          </div>
-          <div>
-            <dt className="text-[11px] uppercase tracking-wider text-neutral-500">Deposit</dt>
-            <dd className="font-semibold text-neutral-900 mt-0.5">{formatNaira(s.deposit)}</dd>
-          </div>
-          <div>
-            <dt className="text-[11px] uppercase tracking-wider text-neutral-500">From</dt>
-            <dd className="text-neutral-700 mt-0.5">{s.source}</dd>
-          </div>
-          <div>
-            <dt className="text-[11px] uppercase tracking-wider text-neutral-500">Port</dt>
-            <dd className="text-neutral-700 mt-0.5">{s.port}</dd>
-          </div>
-        </dl>
-
-        <Link
-          href={`/pre-orders/${s.id}`}
-          className="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-neutral-950 px-4 py-2.5 text-sm font-semibold text-white hover:bg-neutral-800"
-        >
-          Reserve a slot
-          <Arrow small />
-        </Link>
-      </div>
-    </article>
-  );
-}
-
-function ShipRow({ car, route, eta }: { car: string; route: string; eta: string }) {
-  return (
-    <li className="flex items-center gap-4">
-      <span className="grid place-items-center h-10 w-10 rounded-full bg-green-50 text-green-700 shrink-0">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <path d="M2 20a2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1 2.4 2.4 0 0 1 2-1 2.4 2.4 0 0 1 2 1 2.4 2.4 0 0 0 2 1 2.4 2.4 0 0 0 2-1" />
-          <path d="M4 18l-2-6h20l-2 6" />
-          <path d="M12 10V4M9 4h6" />
-        </svg>
-      </span>
-      <div className="flex-1 min-w-0">
-        <p className="font-medium text-neutral-900 truncate">{car}</p>
-        <p className="text-xs text-neutral-500 mt-0.5">{route}</p>
-      </div>
-      <span className="text-xs font-medium text-neutral-600 whitespace-nowrap">{eta}</span>
-    </li>
   );
 }
 
