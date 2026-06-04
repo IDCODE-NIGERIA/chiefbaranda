@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import InTransit from './InTransit';
+
 const Listings = () => {
   const featured = [
     { id: 1, img: '/list1.png', name: 'Toyota Camry 2020', price: '₦ 17,000,000', loc: 'Abuja, Nigeria', tag: 'Verified' },
@@ -17,12 +19,10 @@ const Listings = () => {
   ];
 
   return (
-    // Main section background set to pure white
-    <section className="bg-white py-10">
-      <div className="max-w-7xl mx-auto px-8 space-y-20">
-        
-        {/* Featured Listing Section */}
-        <div>
+    <>
+      {/* Featured Listing Section */}
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-8">
           <h2 className="text-2xl font-bold mb-8 text-gray-900">Featured Listing</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {featured.map((car) => (
@@ -52,9 +52,13 @@ const Listings = () => {
             ))}
           </div>
         </div>
+      </section>
 
-        {/* Coming Soon Section */}
-        <div>
+      <InTransit />
+
+      {/* Coming Soon Section */}
+      <section className="bg-white py-10">
+        <div className="max-w-7xl mx-auto px-8">
           <h2 className="text-2xl font-bold mb-6 text-green-700">Coming Soon</h2>
           {/* Outer Bordered Container */}
           <div className="border border-gray-200 rounded-3xl p-8 bg-white">
@@ -74,9 +78,8 @@ const Listings = () => {
             </div>
           </div>
         </div>
-
-      </div>
-    </section>
+      </section>
+    </>
   );
 };
 
