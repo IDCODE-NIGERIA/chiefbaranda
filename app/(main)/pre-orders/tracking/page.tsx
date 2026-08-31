@@ -4,7 +4,7 @@ import type { Metadata } from 'next';
 
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/session';
-import { formatNairaExact } from '@/lib/carData';
+import { formatNairaExact, safeImageSrc} from '@/lib/carData';
 import { OrderStatusBadge } from '@/components/OrderStatusBadge';
 import type { Order } from '@/lib/models/Order';
 
@@ -84,7 +84,7 @@ export default async function TrackingPage() {
                 >
                   <div className="relative h-20 w-28 shrink-0 rounded-xl bg-neutral-100 overflow-hidden">
                     <Image
-                      src={order.listingImage || '/logo.png'}
+                      src={safeImageSrc(order.listingImage)}
                       alt={order.listingTitle}
                       fill
                       sizes="112px"

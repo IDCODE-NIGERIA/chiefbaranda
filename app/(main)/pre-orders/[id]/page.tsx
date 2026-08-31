@@ -4,6 +4,9 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getPreOrderSlot } from '@/lib/catalog';
+import { getCurrentUser } from '@/lib/session';
+import { prisma } from '@/lib/prisma';
+import SaveCarButton from '@/components/SaveCarButton';
 import { formatNairaExact, originCountries, conditionLabels } from '@/lib/carData';
 import { depositLabel, quoteOrder } from '@/lib/config';
 
@@ -35,6 +38,15 @@ export default async function PreOrderDetailPage({ params }: PageProps<'/pre-ord
   const slot = await getPreOrderSlot(id);
 
   if (!slot) notFound();
+
+  const viewer = await getCurrentUser();
+  const alreadySaved = viewer
+    ? Boolean(
+        await prisma.savedCar.findUnique({
+          where: { userId_listingId: { userId: viewer.id, listingId: slot.id } },
+        })
+      )
+    : false;
 
   const quote = quoteOrder({ price: slot.fromPrice, kind: 'pre-order', plan: 'deposit' });
   const country = originCountries.find((c) => c.slug === slot.origin);
@@ -183,6 +195,14 @@ export default async function PreOrderDetailPage({ params }: PageProps<'/pre-ord
                   </svg>
                 </Link>
               )}
+
+              <div className="mt-3">
+                <SaveCarButton
+                  listingId={slot.id}
+                  listingKind="pre-order"
+                  initialSaved={alreadySaved}
+                />
+              </div>
 
               <p className="mt-4 text-xs text-neutral-500 text-center">
                 Deposit refunded in full if you walk away at inspection.

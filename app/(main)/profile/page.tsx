@@ -4,6 +4,7 @@ import type { Metadata } from 'next';
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/session';
 import ProfileEditor from '@/components/ProfileEditor';
+import ProfileExtras from '@/components/ProfileExtras';
 
 export const metadata: Metadata = {
   title: 'My profile · ChiefBaranda',
@@ -23,22 +24,26 @@ export default async function ProfilePage() {
   // paint; the editor then tracks AuthContext so edits show up instantly in
   // the header too.
   return (
-    <ProfileEditor
-      orderCount={orderCount}
-      initialUser={{
-        userId: user.id,
-        firstName: user.firstName,
-        lastName: user.lastName,
-        email: user.email,
-        phone: user.phone,
-        userType: user.userType,
-        avatar: user.avatar,
-        verified: user.verified,
-        isAdmin: user.isAdmin,
-        address: user.address,
-        city: user.city,
-        state: user.state,
-      }}
-    />
+    <div className="bg-white">
+      <ProfileEditor
+        orderCount={orderCount}
+        initialUser={{
+          userId: user.id,
+          firstName: user.firstName,
+          lastName: user.lastName,
+          email: user.email,
+          phone: user.phone,
+          userType: user.userType,
+          avatar: user.avatar,
+          verified: user.verified,
+          isAdmin: user.isAdmin,
+          address: user.address,
+          city: user.city,
+          state: user.state,
+        }}
+      />
+
+      <ProfileExtras userId={user.id} email={user.email} />
+    </div>
   );
 }

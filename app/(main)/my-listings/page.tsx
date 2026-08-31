@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 
 import { prisma } from '@/lib/prisma';
 import { getCurrentUser } from '@/lib/session';
-import { formatNairaExact, conditionLabels } from '@/lib/carData';
+import { formatNairaExact, conditionLabels, safeImageSrc} from '@/lib/carData';
 import type { Car } from '@/lib/models/Car';
 
 export const metadata: Metadata = {
@@ -76,7 +76,7 @@ export default async function MyListingsPage() {
               >
                 <div className="relative h-20 w-28 shrink-0 rounded-xl bg-neutral-100 overflow-hidden">
                   <Image
-                    src={car.images[0] || '/logo.png'}
+                    src={safeImageSrc(car.images[0])}
                     alt={car.title}
                     fill
                     sizes="112px"

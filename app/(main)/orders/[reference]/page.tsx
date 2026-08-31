@@ -5,7 +5,7 @@ import type { Metadata } from 'next';
 
 import { getCurrentUser } from '@/lib/session';
 import { getOrderByReference } from '@/lib/orders';
-import { formatNairaExact } from '@/lib/carData';
+import { formatNairaExact, safeImageSrc} from '@/lib/carData';
 import { OrderStatusBadge } from '@/components/OrderStatusBadge';
 import type { OrderStatus } from '@/lib/models/Order';
 
@@ -57,7 +57,7 @@ export default async function OrderDetailPage({ params }: PageProps<'/orders/[re
         <div className="flex flex-col sm:flex-row sm:items-center gap-5">
           <div className="relative h-24 w-32 shrink-0 rounded-2xl bg-neutral-100 overflow-hidden">
             <Image
-              src={order.listingImage || '/logo.png'}
+              src={safeImageSrc(order.listingImage)}
               alt={order.listingTitle}
               fill
               sizes="128px"

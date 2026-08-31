@@ -4,7 +4,10 @@ import { notFound } from 'next/navigation';
 import type { Metadata } from 'next';
 
 import { getCar } from '@/lib/catalog';
-import { formatNairaExact, conditionLabels, conditionColors } from '@/lib/carData';
+import { getCurrentUser } from '@/lib/session';
+import { prisma } from '@/lib/prisma';
+import SaveCarButton from '@/components/SaveCarButton';
+import { formatNairaExact, conditionLabels, conditionColors, safeImageSrc} from '@/lib/carData';
 import { depositLabel, quoteOrder } from '@/lib/config';
 
 export async function generateMetadata({
@@ -27,6 +30,16 @@ export default async function CarPage({ params }: PageProps<'/cars/[id]'>) {
   const car = await getCar(id);
 
   if (!car) notFound();
+
+  // Whether this buyer has already saved it, so the heart renders filled.
+  const viewer = await getCurrentUser();
+  const alreadySaved = viewer
+    ? Boolean(
+        await prisma.savedCar.findUnique({
+          where: { userId_listingId: { userId: viewer.id, listingId: car.slug } },
+        })
+      )
+    : false;
 
   const listingId = car.slug || car.id;
   const quote = quoteOrder({ price: car.price, kind: 'buy', plan: 'deposit' });
@@ -59,7 +72,7 @@ export default async function CarPage({ params }: PageProps<'/cars/[id]'>) {
           <div className="lg:col-span-7">
             <div className="relative aspect-16/10 rounded-2xl overflow-hidden bg-neutral-100">
               <Image
-                src={car.images[0] || '/logo.png'}
+                src={safeImageSrc(car.images[0])}
                 alt={car.title}
                 fill
                 sizes="(max-width: 1024px) 100vw, 60vw"
@@ -151,6 +164,10 @@ export default async function CarPage({ params }: PageProps<'/cars/[id]'>) {
                   </svg>
                 </Link>
               )}
+
+              <div className="mt-3">
+                <SaveCarButton listingId={listingId} initialSaved={alreadySaved} />
+              </div>
 
               <ul className="mt-6 space-y-2.5 text-sm text-neutral-600">
                 {[
