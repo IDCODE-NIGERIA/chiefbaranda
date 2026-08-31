@@ -331,6 +331,24 @@ export function formatNaira(n: number): string {
 }
 
 /**
+ * A src `next/image` can render, or the logo as a fallback.
+ *
+ * `next/image` throws on a malformed src, which would take down the whole
+ * page rather than showing one broken thumbnail. Writes are validated, but
+ * this keeps rendering safe for anything already stored.
+ */
+export function safeImageSrc(src: string | null | undefined): string {
+  if (!src) return '/logo.png';
+  if (src.startsWith('/') && !src.startsWith('//')) return src;
+  try {
+    const url = new URL(src);
+    return url.protocol === 'http:' || url.protocol === 'https:' ? src : '/logo.png';
+  } catch {
+    return '/logo.png';
+  }
+}
+
+/**
  * Full naira amount with separators \u2014 use wherever the exact figure matters
  * (checkout totals, receipts, admin tables) rather than the abbreviated
  * `formatNaira` used on cards.

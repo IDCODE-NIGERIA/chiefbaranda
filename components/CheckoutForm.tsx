@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import Image from 'next/image';
 
-import { formatNairaExact } from '@/lib/carData';
+import { formatNairaExact, safeImageSrc} from '@/lib/carData';
 import {
   FINANCE_PLANS,
   quoteOrder,
@@ -372,7 +372,7 @@ export default function CheckoutForm({
               <div className="flex gap-4 p-5 border-b border-neutral-100">
                 <div className="relative h-20 w-28 shrink-0 rounded-xl bg-neutral-100 overflow-hidden">
                   <Image
-                    src={listing.image}
+                    src={safeImageSrc(listing.image)}
                     alt={listing.title}
                     fill
                     sizes="112px"

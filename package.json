@@ -11,7 +11,11 @@
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx --env-file=.env prisma/seed.ts",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "make:admin": "tsx --env-file=.env scripts/make-admin.ts",
+    "demo:seed": "tsx --env-file=.env scripts/demo-data.ts seed",
+    "demo:clear": "tsx --env-file=.env scripts/demo-data.ts clear",
+    "catalogue:clear": "tsx --env-file=.env scripts/demo-data.ts clear-catalogue"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

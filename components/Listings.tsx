@@ -4,7 +4,7 @@ import Image from 'next/image';
 import InTransit from './InTransit';
 import NotifyMeButton from './NotifyMeButton';
 import { listCars, listPreOrderSlots } from '@/lib/catalog';
-import { formatNairaExact, conditionLabels } from '@/lib/carData';
+import { formatNairaExact, conditionLabels, safeImageSrc} from '@/lib/carData';
 
 /**
  * Featured inventory on the home page. Server component — reads live listings
@@ -49,7 +49,7 @@ export default async function Listings() {
                   >
                     <Link href={href} className="relative h-48 block">
                       <Image
-                        src={car.images[0] || '/logo.png'}
+                        src={safeImageSrc(car.images[0])}
                         alt={car.title}
                         fill
                         sizes="(max-width: 768px) 100vw, 25vw"
@@ -116,7 +116,7 @@ export default async function Listings() {
                 >
                   <Link href={`/pre-orders/${slot.id}`} className="relative h-24 w-24 shrink-0">
                     <Image
-                      src={slot.image}
+                      src={safeImageSrc(slot.image)}
                       alt={slot.title}
                       fill
                       sizes="96px"

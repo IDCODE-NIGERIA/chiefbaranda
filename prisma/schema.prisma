@@ -38,8 +38,74 @@ model User {
   orders        Order[]
   notifications Notification[]
   applications  SellerApplication[]
+  savedCars     SavedCar[]
+  codes         VerificationCode[]
+
+  /// Set once the user has confirmed the phone by SMS code.
+  phoneVerifiedAt DateTime?
 
   @@map("users")
+}
+
+/// A one-time SMS code, for password resets and phone verification.
+///
+/// The code itself is stored hashed — it is a credential, and a leaked
+/// database dump must not hand out working reset codes. Rows are single-use
+/// and short-lived.
+model VerificationCode {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  /// bcrypt hash of the 6-digit code.
+  codeHash String
+  /// 'reset' (forgot password) or 'verify' (confirm phone ownership).
+  purpose  String
+  /// Where it was sent, so the user can be told which number to check.
+  sentTo   String
+
+  expiresAt  DateTime
+  consumedAt DateTime?
+  /// Wrong guesses so far. The row is burned once this hits the limit.
+  attempts   Int       @default(0)
+
+  createdAt DateTime @default(now())
+
+  @@index([userId, purpose, createdAt])
+  @@map("verification_codes")
+}
+
+/// An uploaded image, served by /api/images/[id].
+///
+/// Bytes live in their own table so listing queries never drag photo data
+/// along. Swap for a CDN later by changing what the upload route returns —
+/// `Car.images` just holds URLs, so nothing else needs to know.
+model Image {
+  id         String   @id @default(cuid())
+  data       Bytes
+  mimeType   String
+  /// Bytes on disk, kept for the admin storage view.
+  size       Int
+  uploadedBy String?
+  createdAt  DateTime @default(now())
+
+  @@map("images")
+}
+
+/// A car a buyer has bookmarked to come back to.
+model SavedCar {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  /// Car slug rather than a foreign key, so a saved car survives the listing
+  /// being replaced and can also point at a pre-order slot.
+  listingId    String
+  listingKind  String @default("buy")
+  createdAt DateTime @default(now())
+
+  @@unique([userId, listingId])
+  @@index([userId, createdAt])
+  @@map("saved_cars")
 }
 
 model Car {

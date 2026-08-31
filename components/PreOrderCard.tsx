@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 
-import { formatNaira, type PreOrderSlot } from '@/lib/carData';
+import { formatNaira, type PreOrderSlot, safeImageSrc} from '@/lib/carData';
 
 /**
  * Accepts either the static fixture or a database row — the row's `port` is a
@@ -15,7 +15,7 @@ export default function PreOrderCard({ s }: { s: SlotLike }) {
     <article className="group rounded-2xl border border-neutral-200 bg-white overflow-hidden hover:border-neutral-900 transition-colors flex flex-col">
       <div className="relative aspect-16/10 bg-linear-to-br from-neutral-100 to-neutral-50">
         <Image
-          src={s.image}
+          src={safeImageSrc(s.image)}
           alt={`${s.title} ${s.trim}`}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
