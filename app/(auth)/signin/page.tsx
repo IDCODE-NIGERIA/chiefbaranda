@@ -60,6 +60,15 @@ function SignInContent() {
         </p>
       </div>
 
+      {params.get('reset') === '1' && !authError && (
+        <div className="mb-5 flex gap-3 rounded-lg border border-green-200 bg-green-50/70 px-4 py-3 text-sm text-green-800">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="mt-0.5 shrink-0">
+            <path d="M20 6L9 17l-5-5" />
+          </svg>
+          <span>Password changed. Sign in with your new one.</span>
+        </div>
+      )}
+
       {authError && (
         <div
           role="alert"
