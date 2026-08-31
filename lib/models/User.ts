@@ -1,17 +1,12 @@
-import { ObjectId } from 'mongodb';
+import type { UserModel } from '@/lib/generated/prisma/models';
 
-export interface User {
-  _id?: ObjectId;
-  firstName: string;
-  lastName: string;
-  email: string;
-  phone: string;
-  password: string; // hashed
-  userType: 'buyer' | 'seller';
-  avatar?: string; // base64 or URL
-  verified: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+export type UserType = 'buyer' | 'seller';
+export type Role = 'user' | 'admin';
+
+/** A user row with the text columns narrowed to their real unions. */
+export type User = Omit<UserModel, 'userType' | 'role'> & {
+  userType: UserType;
+  role: Role;
+};
 
 export type UserPublic = Omit<User, 'password'>;

@@ -20,6 +20,69 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Configuration
+
+Copy `.env.example` to `.env` and fill it in. Both Next.js and the Prisma CLI
+read that file. The app needs `DATABASE_URL` and `JWT_SECRET`; payments and SMS
+degrade gracefully without their keys (orders are still recorded, alerts are
+logged instead of sent).
+
+```bash
+cp .env.example .env
+```
+
+## Database
+
+Postgres via [Prisma](https://www.prisma.io/). The schema lives in
+`prisma/schema.prisma` and the client is generated into `lib/generated/prisma`
+(gitignored — `npm install` regenerates it via `postinstall`).
+
+```bash
+npm run db:migrate   # create + apply a migration in development
+npm run db:deploy    # apply existing migrations (CI / production)
+npm run db:seed      # load the starter car and pre-order catalogue
+npm run db:studio    # browse the data
+```
+
+`DIRECT_URL` is the unpooled connection used for migrations; `DATABASE_URL` is
+the pooled one the app uses at runtime. On Neon they differ only by `-pooler`
+in the host.
+
+Enum-like columns (`orders.status`, `orders.kind`, `cars.condition`, …) are
+text rather than Postgres enums, because their values contain hyphens which
+Prisma cannot express as enum member names. The TypeScript unions in
+`lib/models/` are the source of truth, and CHECK constraints in
+`prisma/migrations/*_order_value_constraints` enforce the same sets in the
+database — along with guards that money is never negative and a deposit can
+never exceed the price of the car.
+
+Without `DATABASE_URL` the browsing pages fall back to the static catalogue in
+`lib/seedCars.ts` and `lib/carData.ts` so the UI still runs, but ordering,
+accounts and payments refuse rather than pretending to work.
+
+### Payments (Paystack)
+
+Deposits are collected through Paystack's hosted checkout:
+
+1. Put your `sk_test_…` key in `PAYSTACK_SECRET_KEY`.
+2. In the Paystack dashboard, set the webhook URL to
+   `https://your-domain.com/api/payments/webhook`. Locally, tunnel it
+   (`ngrok http 3000`) — without the webhook, payments are still confirmed
+   when the buyer is redirected back, but only while their browser is open.
+
+How much is taken upfront lives in `lib/config.ts` (`DEPOSIT_RATES`): **40%**
+to buy a car already in Nigeria, **30%** to pre-order an import. Buyers can
+also pay in full, or spread the balance over 3/6/12 months. Every amount is
+recomputed server-side from the stored listing price — figures posted from the
+browser are ignored.
+
+### Admin
+
+`ADMIN_EMAILS` (comma separated) controls who can reach `/admin`. A user can
+also be made admin by setting `role: "admin"` on their document. Admins get an
+in-dashboard notification plus a Termii SMS the moment a buyer requests a
+payment, and again when the money is confirmed.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:

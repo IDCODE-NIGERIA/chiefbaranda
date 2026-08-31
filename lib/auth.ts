@@ -2,7 +2,22 @@ import bcryptjs from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+/**
+ * A missing secret in production means every token on the platform is
+ * forgeable, so refuse to run rather than fall back to a known string.
+ */
+function jwtSecret(): string {
+  const secret = process.env.JWT_SECRET;
+
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('JWT_SECRET must be set in production');
+    }
+    return 'dev-only-insecure-secret';
+  }
+
+  return secret;
+}
 
 /**
  * Hash a password using bcryptjs
@@ -25,7 +40,7 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
 export function signToken(userId: string, email: string): string {
   return jwt.sign(
     { userId, email },
-    JWT_SECRET,
+    jwtSecret(),
     { expiresIn: '30d' }
   );
 }
@@ -35,7 +50,7 @@ export function signToken(userId: string, email: string): string {
  */
 export function verifyToken(token: string): { userId: string; email: string } | null {
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string; email: string };
+    const decoded = jwt.verify(token, jwtSecret()) as { userId: string; email: string };
     return decoded;
   } catch {
     return null;

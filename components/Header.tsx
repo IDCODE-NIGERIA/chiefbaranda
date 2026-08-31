@@ -71,9 +71,17 @@ const Header = () => {
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className="flex items-center gap-2 p-2 rounded-full hover:bg-gray-100 transition-colors"
                 >
-                  <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
-                    {user?.firstName?.[0]}{user?.lastName?.[0]}
-                  </div>
+                  {user?.avatar ? (
+                    <img
+                      src={user.avatar}
+                      alt=""
+                      className="w-8 h-8 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-8 h-8 bg-green-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                      {user?.firstName?.[0]}{user?.lastName?.[0]}
+                    </div>
+                  )}
                 </button>
 
                 {/* User Dropdown Menu */}
@@ -81,13 +89,22 @@ const Header = () => {
                   <div className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-lg shadow-lg z-50">
                     <Link
                       href="/profile"
+                      onClick={() => setIsUserMenuOpen(false)}
                       className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b"
                     >
                       My Profile
                     </Link>
+                    <Link
+                      href="/orders"
+                      onClick={() => setIsUserMenuOpen(false)}
+                      className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b"
+                    >
+                      My Orders
+                    </Link>
                     {user?.userType === 'seller' && (
                       <Link
                         href="/my-listings"
+                        onClick={() => setIsUserMenuOpen(false)}
                         className="block px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 border-b"
                       >
                         My Listings
@@ -95,7 +112,7 @@ const Header = () => {
                     )}
                     <button
                       onClick={handleLogout}
-                      className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 text-red-600"
+                      className="w-full text-left px-4 py-2.5 text-sm hover:bg-gray-50 text-red-600"
                     >
                       Logout
                     </button>
@@ -166,6 +183,12 @@ const Header = () => {
                     className="px-6 py-3 text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-full hover:bg-gray-50"
                   >
                     My Profile
+                  </Link>
+                  <Link
+                    href="/orders"
+                    className="px-6 py-3 text-center text-sm font-medium text-gray-700 border border-gray-300 rounded-full hover:bg-gray-50"
+                  >
+                    My Orders
                   </Link>
                   <button
                     onClick={handleLogout}

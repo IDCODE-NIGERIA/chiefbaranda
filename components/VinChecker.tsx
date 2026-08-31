@@ -1,6 +1,22 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
+
+import { formatNairaExact } from '@/lib/carData';
+
+type VinListing = {
+  id: string;
+  title: string;
+  price: number;
+  image: string | null;
+  condition: string;
+  location: string | null;
+  sellerName: string;
+  sellerVerified: boolean;
+  status: string;
+  yearMismatch: boolean;
+};
 
 type VinResult = {
   vin: string;
@@ -20,6 +36,8 @@ type VinResult = {
   plantCountry: string | null;
   partial: boolean;
   note: string | null;
+  /** Set when this chassis number matches a car listed on ChiefBaranda. */
+  listing: VinListing | null;
 };
 
 const specFields: { label: string; key: keyof VinResult }[] = [
@@ -74,7 +92,7 @@ export default function VinChecker() {
     : [];
 
   return (
-    <section className="bg-neutral-50/60 border-y border-neutral-100">
+    <section id="vin" className="bg-neutral-50/60 border-y border-neutral-100 scroll-mt-24">
       <div className="max-w-7xl mx-auto px-6 lg:px-8 py-14 lg:py-20">
         <div className="grid lg:grid-cols-12 gap-10 items-start">
           {/* Intro */}
@@ -142,6 +160,54 @@ export default function VinChecker() {
                     {result.vin}
                   </span>
                 </div>
+
+                {result.listing ? (
+                  <div className="border-b border-neutral-100 bg-green-50/50 px-6 py-5">
+                    <p className="flex items-center gap-1.5 text-xs font-medium uppercase tracking-wider text-green-800">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                        <path d="M20 6L9 17l-5-5" />
+                      </svg>
+                      Listed on ChiefBaranda
+                    </p>
+
+                    <div className="mt-3 flex flex-wrap items-center justify-between gap-4">
+                      <div>
+                        <p className="font-semibold text-neutral-900">{result.listing.title}</p>
+                        <p className="text-sm text-neutral-600 mt-0.5">
+                          {formatNairaExact(result.listing.price)}
+                          {result.listing.location ? ` · ${result.listing.location}` : ''} ·{' '}
+                          {result.listing.sellerName}
+                          {result.listing.sellerVerified && ' (verified seller)'}
+                        </p>
+                      </div>
+
+                      {result.listing.status === 'sold' ? (
+                        <span className="rounded-full bg-neutral-200 px-4 py-2 text-sm font-medium text-neutral-600">
+                          Already sold
+                        </span>
+                      ) : (
+                        <Link
+                          href={`/cars/${result.listing.id}`}
+                          className="rounded-full bg-green-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-green-700"
+                        >
+                          View listing
+                        </Link>
+                      )}
+                    </div>
+
+                    {result.listing.yearMismatch && (
+                      <p className="mt-3 rounded-lg bg-amber-50 border border-amber-200 px-3 py-2 text-xs text-amber-800">
+                        Careful: the listing says a different model year than the factory
+                        decode. Ask the seller about this before you pay.
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  <p className="border-b border-neutral-100 px-6 py-4 text-sm text-neutral-500">
+                    This chassis number is not on ChiefBaranda. If a seller claims otherwise,
+                    treat it as a red flag.
+                  </p>
+                )}
 
                 {specs.length > 0 && (
                   <dl className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4 px-6 py-5">

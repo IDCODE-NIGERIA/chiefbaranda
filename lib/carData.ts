@@ -1,3 +1,4 @@
+
 export type Condition = 'brand-new' | 'foreign-used' | 'nigerian-used';
 
 export type Brand = {
@@ -327,4 +328,13 @@ export function formatNaira(n: number): string {
     return `\u20A6${formatted}m`;
   }
   return `\u20A6${n.toLocaleString()}`;
+}
+
+/**
+ * Full naira amount with separators \u2014 use wherever the exact figure matters
+ * (checkout totals, receipts, admin tables) rather than the abbreviated
+ * `formatNaira` used on cards.
+ */
+export function formatNairaExact(n: number): string {
+  return `\u20A6${Math.round(n).toLocaleString('en-NG')}`;
 }

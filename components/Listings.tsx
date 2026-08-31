@@ -1,56 +1,94 @@
-/* eslint-disable @next/next/no-img-element */
-'use client';
+import Link from 'next/link';
+import Image from 'next/image';
 
 import InTransit from './InTransit';
+import NotifyMeButton from './NotifyMeButton';
+import { listCars, listPreOrderSlots } from '@/lib/catalog';
+import { formatNairaExact, conditionLabels } from '@/lib/carData';
 
-const Listings = () => {
-  const featured = [
-    { id: 1, img: '/list1.png', name: 'Toyota Camry 2020', price: '₦ 17,000,000', loc: 'Abuja, Nigeria', tag: 'Verified' },
-    { id: 2, img: '/list2.png', name: 'Toyota Camry 2016', price: '₦ 7,500,000', loc: 'Lagos, Nigeria', tag: 'Verified' },
-    { id: 3, img: '/list3.png', name: 'Benz', price: '₦ 45,500,000', loc: 'Coming Soon', tag: 'Pre order' },
-    { id: 4, img: '/list4.png', name: 'Benz', price: '₦ 48,500,000', loc: 'Coming Soon', tag: 'Pre order' },
-  ];
+/**
+ * Featured inventory on the home page. Server component — reads live listings
+ * and open pre-order slots straight from the catalogue.
+ */
+export default async function Listings() {
+  const [featured, slots] = await Promise.all([
+    listCars({ featured: true, limit: 4 }),
+    listPreOrderSlots(),
+  ]);
 
-  const comingSoon = [
-    { id: 1, img: '/cs1.png', name: 'G Wagon', date: 'Expected May 2026' },
-    { id: 2, img: '/cs2.png', name: 'Range Rover', date: 'Expected May 2026' },
-    { id: 3, img: '/cs3.png', name: 'Maybach', date: 'Expected May 2026' },
-    { id: 4, img: '/cs4.png', name: 'BMW', date: 'Expected May 2026' },
-  ];
+  const comingSoon = slots.slice(0, 4);
 
   return (
     <>
       {/* Featured Listing Section */}
       <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-8">
-          <h2 className="text-2xl font-bold mb-8 text-gray-900">Featured Listing</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featured.map((car) => (
-              <div key={car.id} className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
-                <div className="relative h-48">
-                  <img src={car.img} alt={car.name} className="w-full h-full object-cover" />
-                  <span className={`absolute bottom-3 left-3 px-4 py-1.5 rounded-xl text-xs font-semibold text-white ${car.tag === 'Verified' ? 'bg-green-800' : 'bg-green-950'}`}>
-                    {car.tag}
-                  </span>
-                </div>
-                <div className="p-5 space-y-4">
-                  <div>
-                    <h3 className="font-bold text-gray-900 text-lg">{car.name}</h3>
-                    <p className="text-sm font-bold text-gray-900 mt-1">{car.price}</p>
-                  </div>
-                  <div className="flex items-center justify-between pt-2">
-                    <div className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
-                      <span>{car.loc === 'Coming Soon' ? '⏱️' : '📍'}</span>
-                      {car.loc}
-                    </div>
-                    <button className="bg-green-900 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-800 transition-colors">
-                      {car.tag === 'Pre order' ? 'Pre order' : 'Buy Now'}
-                    </button>
-                  </div>
-                </div>
-              </div>
-            ))}
+          <div className="flex items-baseline justify-between mb-8">
+            <h2 className="text-2xl font-bold text-gray-900">Featured Listing</h2>
+            <Link
+              href="/categories"
+              className="text-sm font-medium text-green-700 hover:underline"
+            >
+              See all
+            </Link>
           </div>
+
+          {featured.length === 0 ? (
+            <p className="text-gray-500">No listings are live right now. Check back shortly.</p>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+              {featured.map((car) => {
+                // Static fallback listings have no _id, so the slug is the
+                // stable identity here.
+                const id = car.slug || car.id;
+                const href = `/cars/${id}`;
+                return (
+                  <article
+                    key={id}
+                    className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 flex flex-col"
+                  >
+                    <Link href={href} className="relative h-48 block">
+                      <Image
+                        src={car.images[0] || '/logo.png'}
+                        alt={car.title}
+                        fill
+                        sizes="(max-width: 768px) 100vw, 25vw"
+                        className="object-cover"
+                      />
+                      <span className="absolute bottom-3 left-3 px-4 py-1.5 rounded-xl text-xs font-semibold text-white bg-green-800">
+                        {car.sellerVerified ? 'Verified' : conditionLabels[car.condition]}
+                      </span>
+                    </Link>
+
+                    <div className="p-5 space-y-4 flex-1 flex flex-col">
+                      <div>
+                        <h3 className="font-bold text-gray-900 text-lg">
+                          <Link href={href} className="hover:text-green-700 transition-colors">
+                            {car.title}
+                          </Link>
+                        </h3>
+                        <p className="text-sm font-bold text-gray-900 mt-1">
+                          {formatNairaExact(car.price)}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between pt-2 mt-auto">
+                        <span className="flex items-center gap-1.5 text-gray-500 text-xs font-medium">
+                          📍 {car.location || 'Nigeria'}
+                        </span>
+                        <Link
+                          href={href}
+                          className="bg-green-900 text-white px-5 py-2 rounded-xl text-xs font-bold hover:bg-green-800 transition-colors"
+                        >
+                          Buy Now
+                        </Link>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          )}
         </div>
       </section>
 
@@ -59,19 +97,42 @@ const Listings = () => {
       {/* Coming Soon Section */}
       <section className="bg-white py-10">
         <div className="max-w-7xl mx-auto px-8">
-          <h2 className="text-2xl font-bold mb-6 text-green-700">Coming Soon</h2>
-          {/* Outer Bordered Container */}
+          <div className="flex items-baseline justify-between mb-6">
+            <h2 className="text-2xl font-bold text-green-700">Coming Soon</h2>
+            <Link
+              href="/pre-orders"
+              className="text-sm font-medium text-green-700 hover:underline"
+            >
+              All pre-orders
+            </Link>
+          </div>
+
           <div className="border border-gray-200 rounded-3xl p-8 bg-white">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {comingSoon.map((car) => (
-                <div key={car.id} className="flex gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm items-center">
-                  <img src={car.img} alt={car.name} className="w-24 h-24 object-cover rounded-xl flex-shrink-0" />
-                  <div className="flex-1 space-y-1">
-                    <h3 className="font-bold text-gray-900 text-sm">{car.name}</h3>
-                    <p className="text-[11px] text-gray-500 font-semibold">{car.date}</p>
-                    <button className="bg-green-800 text-white w-full py-2 rounded-xl text-[11px] font-bold mt-3 hover:bg-green-700 transition-all">
-                      Notify me
-                    </button>
+              {comingSoon.map((slot) => (
+                <div
+                  key={slot.id}
+                  className="flex gap-4 p-4 bg-white rounded-2xl border border-gray-100 shadow-sm items-center"
+                >
+                  <Link href={`/pre-orders/${slot.id}`} className="relative h-24 w-24 shrink-0">
+                    <Image
+                      src={slot.image}
+                      alt={slot.title}
+                      fill
+                      sizes="96px"
+                      className="object-cover rounded-xl"
+                    />
+                  </Link>
+                  <div className="flex-1 min-w-0 space-y-1">
+                    <h3 className="font-bold text-gray-900 text-sm truncate">
+                      <Link href={`/pre-orders/${slot.id}`} className="hover:text-green-700">
+                        {slot.title}
+                      </Link>
+                    </h3>
+                    <p className="text-[11px] text-gray-500 font-semibold">
+                      Arrives in {slot.eta}
+                    </p>
+                    <NotifyMeButton listingId={slot.id} listingTitle={slot.title} />
                   </div>
                 </div>
               ))}
@@ -81,6 +142,4 @@ const Listings = () => {
       </section>
     </>
   );
-};
-
-export default Listings;
+}

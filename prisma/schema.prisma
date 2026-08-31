@@ -1,0 +1,213 @@
+// ChiefBaranda data model.
+//
+// Money is stored as whole naira in Int columns — no kobo, no floats. The
+// largest listing is well under the 2.1bn Int ceiling.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        String  @id @default(cuid())
+  firstName String
+  lastName  String
+  email     String  @unique
+  phone     String
+  password  String
+  userType  String  @default("buyer")
+  role      String  @default("user")
+  /// Profile photo as a data URI. Small and self-contained — swap for a blob
+  /// store URL when car photo uploads arrive.
+  avatar    String?
+  verified  Boolean @default(false)
+
+  /// Default delivery address, used to prefill checkout.
+  address String?
+  city    String?
+  state   String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  cars          Car[]
+  orders        Order[]
+  notifications Notification[]
+  applications  SellerApplication[]
+
+  @@map("users")
+}
+
+model Car {
+  id               String        @id @default(cuid())
+  slug             String        @unique
+  title            String
+  brand            String
+  condition        String
+  type             String
+  price            Int
+  sellerId         String?
+  seller           User?         @relation(fields: [sellerId], references: [id], onDelete: SetNull)
+  sellerName       String
+  sellerVerified   Boolean       @default(false)
+  description      String
+  images           String[]
+  preOrder         Boolean       @default(false)
+  expectedDelivery DateTime?
+  mileage          Int?
+  year             Int?
+  color            String?
+  transmission     String?
+  fuel             String?
+  featured         Boolean       @default(false)
+  location         String?
+  vin              String?
+  status           String        @default("available")
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+
+  @@index([brand, condition, type])
+  @@index([featured])
+  @@index([vin])
+  @@map("cars")
+}
+
+model PreOrderSlot {
+  // Human-readable slug, e.g. "rav4-2023" — also the public URL segment.
+  id        String    @id
+  title     String
+  trim      String
+  brand     String
+  origin    String
+  condition String
+  image     String
+  fromPrice Int
+  deposit   Int
+  eta       String
+  port      String
+  remaining Int
+  source    String
+  active    Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  @@index([origin])
+  @@map("preorder_slots")
+}
+
+model Order {
+  id        String @id @default(cuid())
+  // Short code shown to the buyer and used as the Paystack reference.
+  reference String @unique
+
+  // Null for guest checkout.
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  // Buyer details as given at checkout — kept on the order even if the
+  // account is later deleted, because this is the delivery record.
+  buyerName    String
+  buyerEmail   String
+  buyerPhone   String
+  buyerAddress String
+  buyerCity    String
+  buyerState   String
+  buyerNotes   String?
+
+  kind         String
+  listingId    String
+  listingTitle String
+  listingImage String
+
+  plan          String      @default("deposit")
+  financeMonths Int?
+
+  price            Int
+  amountDueNow     Int
+  balance          Int
+  financeFee       Int @default(0)
+  monthlyInstalment Int @default(0)
+
+  status                   String      @default("pending")
+  paystackReference        String
+  paystackAuthorizationUrl String?
+  paidAt                   DateTime?
+  paystackData             Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId, createdAt])
+  @@index([buyerEmail])
+  @@index([status])
+  @@map("orders")
+}
+
+model Notification {
+  id       String               @id @default(cuid())
+  audience String
+  userId   String?
+  user     User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  kind  String
+  title String
+  body  String
+  href  String?
+
+  read     Boolean @default(false)
+  smsSent  Boolean?
+  smsError String?
+
+  createdAt DateTime @default(now())
+
+  @@index([audience, createdAt])
+  @@index([userId, createdAt])
+  @@map("notifications")
+}
+
+model SellerApplication {
+  id     String  @id @default(cuid())
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  firstName String
+  lastName  String
+  email     String
+  phone     String
+
+  shopName     String
+  shopAddress  String
+  city         String
+  state        String
+  businessType String
+  carsPerMonth String @default("")
+  about        String @default("")
+
+  status     String            @default("pending")
+  reviewedAt DateTime?
+  reviewedBy String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([status, createdAt])
+  @@map("seller_applications")
+}
+
+model StockAlert {
+  id           String   @id @default(cuid())
+  email        String
+  phone        String?
+  listingId    String
+  listingTitle String
+  notified     Boolean  @default(false)
+  createdAt    DateTime @default(now())
+
+  // One open alert per person per car.
+  @@unique([email, listingId])
+  @@map("stock_alerts")
+}

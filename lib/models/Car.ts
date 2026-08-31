@@ -1,25 +1,20 @@
-import { ObjectId } from 'mongodb';
+import type { CarModel, PreOrderSlotModel } from '@/lib/generated/prisma/models';
 
-export interface Car {
-  _id?: ObjectId;
-  title: string;
-  brand: string;
-  condition: 'brand-new' | 'foreign-used' | 'nigerian-used';
-  type: 'sedan' | 'suv' | 'truck' | 'coupe' | 'hatchback' | 'van' | string;
-  price: number;
-  sellerId: ObjectId | string;
-  sellerName: string;
-  sellerVerified: boolean;
-  description: string;
-  images: string[]; // URLs or base64
-  preOrder: boolean;
-  expectedDelivery?: Date; // for pre-orders
-  mileage?: number;
-  year?: number;
-  color?: string;
-  transmission?: 'manual' | 'automatic';
-  fuel?: 'petrol' | 'diesel' | 'hybrid' | 'electric';
-  featured: boolean;
-  createdAt: Date;
-  updatedAt: Date;
-}
+import type { Condition } from '@/lib/carData';
+
+export type CarStatus = 'available' | 'reserved' | 'sold';
+export type Transmission = 'manual' | 'automatic';
+export type Fuel = 'petrol' | 'diesel' | 'hybrid' | 'electric';
+
+/** A car row with the text columns narrowed to their real unions. */
+export type Car = Omit<CarModel, 'condition' | 'status' | 'transmission' | 'fuel'> & {
+  condition: Condition;
+  status: CarStatus;
+  transmission: Transmission | null;
+  fuel: Fuel | null;
+};
+
+/** A pre-order slot row, likewise narrowed. */
+export type PreOrderSlotRow = Omit<PreOrderSlotModel, 'condition'> & {
+  condition: Condition;
+};

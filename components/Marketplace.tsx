@@ -1,6 +1,8 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
 
+import Link from 'next/link';
+
 const TrustAndCTA = () => {
   const features = [
     {
@@ -69,10 +71,13 @@ const TrustAndCTA = () => {
             </div>
 
             {/* Button - Centered relative to the text row */}
-            <div className="mt-6 md:mt-0 md:mr-40"> 
-                <button className="bg-green-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-green-800 transition-colors">
+            <div className="mt-6 md:mt-0 md:mr-40">
+                <Link
+                  href="/pre-orders"
+                  className="inline-flex bg-green-900 text-white px-8 py-3 rounded-xl font-bold text-sm hover:bg-green-800 transition-colors"
+                >
                 Pre-Order Now
-                </button>
+                </Link>
             </div>
             </div>
 

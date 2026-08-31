@@ -3,7 +3,13 @@ import Image from 'next/image';
 
 import { formatNaira, type PreOrderSlot } from '@/lib/carData';
 
-export default function PreOrderCard({ s }: { s: PreOrderSlot }) {
+/**
+ * Accepts either the static fixture or a database row — the row's `port` is a
+ * plain string rather than the fixture's narrower union.
+ */
+type SlotLike = Omit<PreOrderSlot, 'port'> & { port: string };
+
+export default function PreOrderCard({ s }: { s: SlotLike }) {
   const urgent = s.remaining <= 2;
   return (
     <article className="group rounded-2xl border border-neutral-200 bg-white overflow-hidden hover:border-neutral-900 transition-colors flex flex-col">

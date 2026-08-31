@@ -1,9 +1,20 @@
 'use client';
 
 /* eslint-disable @next/next/no-img-element */
+import { useState } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 const Hero = () => {
+  const router = useRouter();
+  const [query, setQuery] = useState('');
+
+  function handleSearch(e: React.FormEvent) {
+    e.preventDefault();
+    const trimmed = query.trim();
+    router.push(trimmed ? `/categories?q=${encodeURIComponent(trimmed)}` : '/categories');
+  }
+
   return (
     <section className="bg-white pt-10 pb-16 md:pt-12 md:pb-12">
       <div className="max-w-7xl mx-auto px-8">
@@ -27,26 +38,32 @@ const Hero = () => {
               
               {/* Column 1: Search + Buttons */}
               <div className="w-full max-w-md space-y-4">
-                <div className="flex gap-3">
+                <form onSubmit={handleSearch} className="flex gap-3">
                   <input
                     type="text"
+                    value={query}
+                    onChange={(e) => setQuery(e.target.value)}
                     placeholder="Search cars..."
+                    aria-label="Search cars"
                     className="flex-1 px-5 py-3.5 bg-gray-100 rounded-2xl text-gray-700 focus:outline-none focus:ring-2 focus:ring-green-500 placeholder-gray-500"
                   />
-                  <button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3.5 rounded-2xl font-medium transition-colors whitespace-nowrap">
+                  <button
+                    type="submit"
+                    className="bg-green-600 hover:bg-green-700 text-white px-8 py-3.5 rounded-2xl font-medium transition-colors whitespace-nowrap"
+                  >
                     Search
                   </button>
-                </div>
+                </form>
 
                 <div className="flex flex-wrap gap-4">
                   <Link
-                    href=""
+                    href="/become-seller"
                     className="flex-1 bg-green-600 hover:bg-green-700 text-white py-3.5 rounded-2xl font-medium text-center transition-colors"
                   >
                     Start Selling
                   </Link>
                   <Link
-                    href=""
+                    href="/categories"
                     className="flex-1 border border-gray-300 hover:bg-gray-50 py-3.5 rounded-2xl font-medium text-gray-700 text-center transition-colors"
                   >
                     Browse Listing
