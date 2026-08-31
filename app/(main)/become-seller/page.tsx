@@ -45,20 +45,48 @@ export default function BecomeSellerPage() {
   const [form, setForm] = useState<SellerForm>(initialForm);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [formError, setFormError] = useState<string | null>(null);
 
   function update(field: keyof SellerForm, value: string | boolean) {
     setForm((prev) => ({ ...prev, [field]: value }));
+    if (errors[field]) {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[field];
+        return next;
+      });
+    }
   }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setSubmitting(true);
+    setFormError(null);
 
-    // Simulate submission. In production this would POST to /api/sellers/apply
-    await new Promise((r) => setTimeout(r, 1500));
+    try {
+      const res = await fetch('/api/sellers/apply', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(form),
+      });
 
-    setSubmitting(false);
-    setSubmitted(true);
+      const json = await res.json();
+
+      if (!res.ok) {
+        if (json.errors) setErrors(json.errors);
+        setFormError(json.error || 'We could not send your application.');
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
+    } catch {
+      setFormError('Network problem. Check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   if (submitted) {
@@ -322,6 +350,21 @@ export default function BecomeSellerPage() {
               . I understand my shop will be verified before listings go live.
             </label>
           </div>
+
+          {(formError || Object.keys(errors).length > 0) && (
+            <div className="rounded-xl bg-red-50 border border-red-200 px-4 py-3">
+              <p className="text-sm font-medium text-red-800">
+                {formError || 'Please check the details below.'}
+              </p>
+              {Object.keys(errors).length > 0 && (
+                <ul className="mt-2 space-y-1 text-sm text-red-700 list-disc list-inside">
+                  {Object.entries(errors).map(([field, message]) => (
+                    <li key={field}>{message}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
+          )}
 
           {/* Submit */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">

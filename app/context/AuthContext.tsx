@@ -11,6 +11,21 @@ export interface User {
   userType: 'buyer' | 'seller';
   avatar?: string | null;
   verified: boolean;
+  isAdmin?: boolean;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+}
+
+/** Fields a user is allowed to change about themselves. */
+export interface ProfileUpdate {
+  firstName?: string;
+  lastName?: string;
+  phone?: string;
+  address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  avatar?: string | null;
 }
 
 interface AuthContextType {
@@ -20,8 +35,27 @@ interface AuthContextType {
   signup: (data: SignupData) => Promise<void>;
   signin: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
+  updateProfile: (data: ProfileUpdate) => Promise<void>;
+  changePassword: (
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string
+  ) => Promise<void>;
   error: string | null;
   clearError: () => void;
+}
+
+/**
+ * Errors that carry per-field messages from the API, so forms can show them
+ * next to the right input instead of as one banner.
+ */
+export class FieldError extends Error {
+  fields: Record<string, string>;
+  constructor(message: string, fields: Record<string, string>) {
+    super(message);
+    this.name = 'FieldError';
+    this.fields = fields;
+  }
 }
 
 interface SignupData {
@@ -129,6 +163,65 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  async function updateProfile(data: ProfileUpdate) {
+    setError(null);
+    try {
+      const response = await fetch('/api/auth/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(data),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (result.errors) {
+          throw new FieldError(result.error || 'Please check the fields below', result.errors);
+        }
+        throw new Error(result.error || 'Could not save your changes');
+      }
+
+      // Keep the header, checkout prefill and profile in step.
+      setUser((prev) => (prev ? { ...prev, ...result.data } : result.data));
+    } catch (err) {
+      if (!(err instanceof FieldError)) {
+        setError(err instanceof Error ? err.message : 'Could not save your changes');
+      }
+      throw err;
+    }
+  }
+
+  async function changePassword(
+    currentPassword: string,
+    newPassword: string,
+    confirmPassword: string
+  ) {
+    setError(null);
+    try {
+      const response = await fetch('/api/auth/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        if (result.errors) {
+          throw new FieldError(result.error || 'Please check the fields below', result.errors);
+        }
+        throw new Error(result.error || 'Could not change your password');
+      }
+    } catch (err) {
+      if (!(err instanceof FieldError)) {
+        setError(err instanceof Error ? err.message : 'Could not change your password');
+      }
+      throw err;
+    }
+  }
+
   function clearError() {
     setError(null);
   }
@@ -142,6 +235,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signup,
         signin,
         logout,
+        updateProfile,
+        changePassword,
         error,
         clearError,
       }}

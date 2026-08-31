@@ -1,43 +1,30 @@
 import { NextRequest } from 'next/server';
-import { ObjectId } from 'mongodb';
-import { getDatabase } from '@/lib/mongodb';
-import { verifyToken } from '@/lib/auth';
+
+import { getSessionUser } from '@/lib/session';
 import { successResponse, errorResponse } from '@/lib/api-utils';
 
 export async function GET(request: NextRequest) {
   try {
-    const token = request.cookies.get('auth')?.value;
-
-    if (!token) {
-      return errorResponse('Not authenticated', 'NOT_AUTHENTICATED', 401);
-    }
-
-    const decoded = verifyToken(token);
-
-    if (!decoded) {
-      return errorResponse('Invalid or expired token', 'INVALID_TOKEN', 401);
-    }
-
-    // Fetch user data
-    const db = await getDatabase();
-    const user = await db.collection('users').findOne({
-      _id: new ObjectId(decoded.userId),
-    });
+    const user = await getSessionUser(request);
 
     if (!user) {
-      return errorResponse('User not found', 'USER_NOT_FOUND', 404);
+      return errorResponse('Not authenticated', 'NOT_AUTHENTICATED', 401);
     }
 
     // Return user data without password
     return successResponse({
-      userId: user._id,
+      userId: user.id,
       firstName: user.firstName,
       lastName: user.lastName,
       email: user.email,
       phone: user.phone,
       userType: user.userType,
-      avatar: user.avatar || null,
+      avatar: user.avatar,
       verified: user.verified,
+      isAdmin: user.isAdmin,
+      address: user.address,
+      city: user.city,
+      state: user.state,
     });
   } catch (error) {
     console.error('Get user error:', error);

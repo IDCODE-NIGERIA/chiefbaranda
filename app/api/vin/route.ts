@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 
+import { findCarByVin } from '@/lib/catalog';
 import { successResponse, errorResponse, validationError } from '@/lib/api-utils';
 
 // 17 chars, no I/O/Q
@@ -72,6 +73,26 @@ export async function POST(request: NextRequest) {
     const model = clean(result.Model);
     const year = clean(result.ModelYear);
 
+    // Cross-check the chassis number against our own inventory so a buyer can
+    // see straight away whether the car is actually listed here — and whether
+    // the decoded year/make matches what the seller wrote.
+    const listedCar = await findCarByVin(rawVin).catch(() => null);
+    const listing = listedCar
+      ? {
+          id: listedCar.slug || listedCar.id,
+          title: listedCar.title,
+          price: listedCar.price,
+          image: listedCar.images[0] ?? null,
+          condition: listedCar.condition,
+          location: listedCar.location ?? null,
+          sellerName: listedCar.sellerName,
+          sellerVerified: listedCar.sellerVerified,
+          status: listedCar.status ?? 'available',
+          /** True when the listing's year disagrees with the factory decode. */
+          yearMismatch: Boolean(year && listedCar.year && String(listedCar.year) !== year),
+        }
+      : null;
+
     if (!make && !model && !year) {
       return errorResponse(
         clean(result.ErrorText) || 'Could not decode this VIN',
@@ -99,6 +120,7 @@ export async function POST(request: NextRequest) {
         plantCountry: clean(result.PlantCountry),
         partial: errorCode !== '0',
         note: errorCode !== '0' ? clean(result.ErrorText) : null,
+        listing,
       },
       'VIN decoded successfully'
     );

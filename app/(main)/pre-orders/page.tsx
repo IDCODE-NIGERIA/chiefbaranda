@@ -2,7 +2,8 @@ import Link from 'next/link';
 import type { Metadata } from 'next';
 
 import PreOrderCard from '@/components/PreOrderCard';
-import { preOrderSlots, originCountries } from '@/lib/carData';
+import { originCountries } from '@/lib/carData';
+import { listPreOrderSlots } from '@/lib/catalog';
 
 export const metadata: Metadata = {
   title: 'Pre-orders · ChiefBaranda',
@@ -59,9 +60,8 @@ export default async function PreOrdersPage({
 }) {
   const { from } = await searchParams;
   const activeCountry = originCountries.find((c) => c.slug === from);
-  const visibleSlots = activeCountry
-    ? preOrderSlots.filter((s) => s.origin === activeCountry.slug)
-    : preOrderSlots;
+  // Live slot counts — `remaining` drops as reservations are paid for.
+  const visibleSlots = await listPreOrderSlots(activeCountry?.slug);
 
   return (
     <div className="bg-white">

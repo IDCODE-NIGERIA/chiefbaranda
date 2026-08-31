@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
-import { getDatabase } from '@/lib/mongodb';
+
+import { prisma } from '@/lib/prisma';
 import { hashPassword, isValidEmail, isValidPassword, isValidPhone, signToken } from '@/lib/auth';
 import { successResponse, validationError, errorResponse, setAuthCookie } from '@/lib/api-utils';
 
@@ -36,8 +37,8 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if user exists
-    const db = await getDatabase();
-    const existingUser = await db.collection('users').findOne({ email: email.toLowerCase() });
+    const normalisedEmail = email.toLowerCase().trim();
+    const existingUser = await prisma.user.findUnique({ where: { email: normalisedEmail } });
 
     if (existingUser) {
       return errorResponse('User with this email already exists', 'EMAIL_EXISTS', 409);
@@ -45,34 +46,34 @@ export async function POST(request: NextRequest) {
 
     // Hash password and create user
     const hashedPassword = await hashPassword(password);
-    const now = new Date();
 
-    const newUser = {
-      firstName: firstName.trim(),
-      lastName: lastName.trim(),
-      email: email.toLowerCase(),
-      phone: phone.trim(),
-      password: hashedPassword,
-      userType,
-      avatar: null,
-      verified: false,
-      createdAt: now,
-      updatedAt: now,
-    };
-
-    const result = await db.collection('users').insertOne(newUser);
+    const newUser = await prisma.user.create({
+      data: {
+        firstName: firstName.trim(),
+        lastName: lastName.trim(),
+        email: normalisedEmail,
+        phone: phone.trim(),
+        password: hashedPassword,
+        userType,
+        verified: false,
+      },
+    });
 
     // Create JWT token
-    const token = signToken(result.insertedId.toString(), email.toLowerCase());
+    const token = signToken(newUser.id, newUser.email);
 
-    // Create response
+    // Same shape as /signin and /me — the client stores all three responses
+    // into the same user state, so they must not drift apart.
     const response = successResponse(
       {
-        userId: result.insertedId,
-        firstName,
-        lastName,
-        email,
-        userType,
+        userId: newUser.id,
+        firstName: newUser.firstName,
+        lastName: newUser.lastName,
+        email: newUser.email,
+        phone: newUser.phone,
+        userType: newUser.userType,
+        avatar: newUser.avatar,
+        verified: newUser.verified,
       },
       'Signup successful',
       201

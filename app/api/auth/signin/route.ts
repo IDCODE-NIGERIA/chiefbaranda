@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 
-import { getDatabase } from '@/lib/mongodb';
+import { prisma } from '@/lib/prisma';
 import { verifyPassword, signToken, isValidEmail } from '@/lib/auth';
 import { successResponse, validationError, errorResponse, setAuthCookie } from '@/lib/api-utils';
 
@@ -22,8 +22,9 @@ export async function POST(request: NextRequest) {
     }
 
     // Find user
-    const db = await getDatabase();
-    const user = await db.collection('users').findOne({ email: email.toLowerCase() });
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase().trim() },
+    });
 
     if (!user) {
       return errorResponse('Invalid email or password', 'INVALID_CREDENTIALS', 401);
@@ -37,18 +38,18 @@ export async function POST(request: NextRequest) {
     }
 
     // Create JWT token
-    const token = signToken(user._id.toString(), email.toLowerCase());
+    const token = signToken(user.id, user.email);
 
     // Create response
     const response = successResponse(
       {
-        userId: user._id,
+        userId: user.id,
         firstName: user.firstName,
         lastName: user.lastName,
         email: user.email,
         phone: user.phone,
         userType: user.userType,
-        avatar: user.avatar || null,
+        avatar: user.avatar,
         verified: user.verified,
       },
       'Sign in successful'
